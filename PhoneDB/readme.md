@@ -1,0 +1,1 @@
+CLR progect for job with SQLite
