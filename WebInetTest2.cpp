@@ -34,7 +34,8 @@ int main(int argc, char* argv[])
         if (hConnect != NULL) {
             // открываем запрос
             // "/fundmetrology/cm/xcdb/vri/select?fq=verification_year:2021&fq=mi.mitnumber:*58016-14*&fq=mi.number:*B140310349*&q=*&fl=vri_id,org_title,mi.mitnumber,mi.mititle,mi.mitype,mi.modification,mi.number,verification_date,valid_date,applicability,result_docnum&sort=verification_date+desc,org_title+asc&rows=20&start=0"
-            HINTERNET hRequest =
+            // /fundmetrology/cm/xcdb/vri/select?fq=verification_year:2022&fq=org_title:*ростест*&fq=mi.mitnumber:*1234\-56*&fq=mi.mititle:*херьня*&fq=mi.mitype:*коня*&fq=mi.modification:*седло*&fq=mi.number:*555*&fq=result_docnum:*99999999*&fq=verification_date:[2022-01-01T00:00:00Z TO 2022-01-30T23:59:59Z]&fq=valid_date:[2023-10-01T00:00:00Z TO 2023-10-30T23:59:59Z]&q=*&fl=vri_id,org_title,mi.mitnumber,mi.mititle,mi.mitype,mi.modification,mi.number,verification_date,valid_date,applicability,result_docnum,sticker_num&sort=verification_date+desc,org_title+asc&rows=20&start=0
+			HINTERNET hRequest =
                 ::HttpOpenRequest(
                     hConnect,
                     TEXT("GET"),

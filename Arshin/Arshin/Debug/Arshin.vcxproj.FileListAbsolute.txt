@@ -1,0 +1,3 @@
+C:\Users\User\source\repos\Arshin\Arshin\Debug\Arshin.vcxproj.AssemblyReference.cache
+C:\Users\User\source\repos\Arshin\Arshin\Debug\Arshin.MyForm.resources
+C:\Users\User\source\repos\Arshin\Arshin\Debug\Arshin.vcxproj.GenerateResource.cache
