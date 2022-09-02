@@ -1,5 +1,11 @@
 #pragma once
 //#include <cliext/vector>
+#include <windows.h>
+#include <wininet.h>
+#include <string>
+#include <msclr/marshal.h>
+#include <msclr/marshal_cppstd.h>
+#pragma comment(lib,"wininet")
 
 namespace ProjectCLR {
 
@@ -472,19 +478,19 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 	if (dateTimePicker1->CustomFormat == " ")
 		verification_date1 = "";
 	else
-		verification_date1 = Convert::ToString(dateTimePicker1->Value.Date);
+		verification_date1 = dateTimePicker1->Value.Date.ToString("yyyy-MM-dd");
 	if(dateTimePicker2->CustomFormat == " ")
 		verification_date2 = "";
 	else
-		verification_date2 = Convert::ToString(dateTimePicker2->Value.Date);
+		verification_date2 = dateTimePicker2->Value.Date.ToString("yyyy-MM-dd");
 	if(dateTimePicker3->CustomFormat == " ")
 		valid_date1 = "";
 	else
-		valid_date1 = Convert::ToString(dateTimePicker3->Value);
+		valid_date1 = dateTimePicker3->Value.Date.ToString("yyyy-MM-dd");
 	if (dateTimePicker4->CustomFormat == " ")
 		valid_date2 = "";
 	else
-		valid_date2 = Convert::ToString(dateTimePicker4->Value);
+		valid_date2 = dateTimePicker4->Value.Date.ToString("yyyy-MM-dd");
 
 	String^ select = "/fundmetrology/cm/xcdb/vri/select?fq=verification_year:";
 	if (verification_year != "")
@@ -503,20 +509,66 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 		select += "&fq=mi.number:*" + znumber + "*";
 	if (result_docnum != "")
 		select += "&fq=result_docnum:*" + result_docnum + "*";
-	if (verification_date1 != "")
+	if (verification_date1 != "") {
 		select += "&fq=verification_date:[" + verification_date1 + "T00:00:00Z";
-	if (verification_date2 != "")
-		select += " TO " + verification_date2 + "T23:59:59Z]";
-	else
-		select += "]";
-	if (valid_date1 != "")
+		if (verification_date2 != "")
+			select += " TO " + verification_date2 + "T23:59:59Z]";
+		else
+			select += "]";
+	}
+	if (valid_date1 != "") {
 		select += "&fq=valid_date:[" + valid_date1 + "T00:00:00Z";
-	if (valid_date2 != "")
-		select += " TO " + valid_date2 + "T23:59:59Z]";
-	else
-		select += "]";
+		if (valid_date2 != "")
+			select += " TO " + valid_date2 + "T23:59:59Z]";
+		else
+			select += "]";
+	}
 	select += "&q=*&fl=vri_id,org_title,mi.mitnumber,mi.mititle,mi.mitype,mi.modification,mi.number,verification_date,valid_date,applicability,result_docnum&sort=verification_date+desc,org_title+asc&rows=20&start=0";
+	//convert String^ to wstring to LPCWSTR
+	std::wstring wstr = msclr::interop::marshal_as<std::wstring>(select);
+	LPCWSTR pcwstr;
+	pcwstr = wstr.c_str();
+	//
+	bool ok = false;
+	std::wstring str;
+	// инициализируем WinInet
+	HINTERNET hInternet = ::InternetOpen(TEXT("Arshin request"), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+	if (hInternet != NULL) {
+		// открываем HTTP сессию
+		HINTERNET hConnect = ::InternetConnect(hInternet, TEXT("fgis.gost.ru"), INTERNET_DEFAULT_HTTP_PORT, NULL, NULL, INTERNET_SERVICE_HTTP, 0, 1u);
+		if (hConnect != NULL) {
+			// открываем запрос
+			HINTERNET hRequest = ::HttpOpenRequest(hConnect, TEXT("GET"), pcwstr, NULL, NULL, 0, INTERNET_FLAG_KEEP_CONNECTION, 1);
+			if (hRequest != NULL) {
+				// посылаем запрос
+				BOOL bSend = ::HttpSendRequest(hRequest, NULL, 0, NULL, 0);
+				if (bSend) {
+					for (;;) {
+						// читаем данные
+						wchar_t szData[1024];
+						DWORD dwBytesRead;
+						BOOL bRead = ::InternetReadFile(hRequest, szData, sizeof(szData) - 1, &dwBytesRead);
+						// выход из цикла при ошибке или завершении
+						if (bRead == FALSE || dwBytesRead == 0)
+							break;
+						// сохраняем результат
+						szData[dwBytesRead] = 0;
+						str += szData;
+						ok = true;
+					}
+				}
+				// закрываем запрос
+				::InternetCloseHandle(hRequest);
+			}
+			// закрываем сессию
+			::InternetCloseHandle(hConnect);
+		}
+		// закрываем WinInet
+		::InternetCloseHandle(hInternet);
+	}
+	select = msclr::interop::marshal_as<String^>(str);
 	textBox9->Text = select;
+
 }
 
 
