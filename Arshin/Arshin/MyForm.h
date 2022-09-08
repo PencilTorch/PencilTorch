@@ -16,6 +16,7 @@ namespace ProjectCLR {
 	using namespace System::Data;
 	using namespace System::Drawing;
 	//using namespace cliext;
+	std::string Utf8_to_cp1251(const std::string_view str);
 
 	/// <summary>
 	/// —водка дл€ MyForm
@@ -530,7 +531,7 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 	pcwstr = wstr.c_str();
 	//
 	bool ok = false;
-	std::wstring str;
+	std::string str;
 	// инициализируем WinInet
 	HINTERNET hInternet = ::InternetOpen(TEXT("Arshin request"), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 	if (hInternet != NULL) {
@@ -545,7 +546,7 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 				if (bSend) {
 					for (;;) {
 						// читаем данные
-						wchar_t szData[1024];
+						char szData[1024];
 						DWORD dwBytesRead;
 						BOOL bRead = ::InternetReadFile(hRequest, szData, sizeof(szData) - 1, &dwBytesRead);
 						// выход из цикла при ошибке или завершении
@@ -566,6 +567,11 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 		// закрываем WinInet
 		::InternetCloseHandle(hInternet);
 	}
+	str = Utf8_to_cp1251(str);
+	
+	
+	
+	
 	select = msclr::interop::marshal_as<String^>(str);
 	textBox9->Text = select;
 
