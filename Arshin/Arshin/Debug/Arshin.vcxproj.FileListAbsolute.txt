@@ -1,8 +1,0 @@
-C:\Users\User\source\repos\Arshin\Arshin\Debug\Arshin.MyForm.resources
-C:\Users\User\source\repos\Arshin\Arshin\Debug\Arshin.vcxproj.GenerateResource.cache
-C:\Users\User\source\repos\Arshin\Arshin\Debug\Arshin.vcxproj.AssemblyReference.cache
-C:\Users\User\Desktop\repo\PencilTorch\Arshin\Arshin\Debug\Arshin.MyForm.resources
-C:\Users\User\Desktop\repo\PencilTorch\Arshin\Arshin\Debug\Arshin.vcxproj.GenerateResource.cache
-H:\cpp\Projects\Arshin\Arshin\Debug\Arshin.vcxproj.AssemblyReference.cache
-H:\cpp\Projects\Arshin\Arshin\Debug\Arshin.MyForm.resources
-H:\cpp\Projects\Arshin\Arshin\Debug\Arshin.vcxproj.GenerateResource.cache
