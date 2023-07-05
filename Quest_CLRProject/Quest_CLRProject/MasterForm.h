@@ -69,15 +69,15 @@ namespace QuestCLRProject {
 		System::Windows::Forms::ToolStripLabel^ _toolStripLabel1;
 		System::Windows::Forms::ToolStripButton^ toolStripButton1;
 		System::Windows::Forms::DataGridView^ _dataGridView1;
-		size_t numberQuestion;
+		size_t numberQuestion; //номер вопроса
 		// выбранный тест
 		System::Windows::Forms::TableLayoutPanel^ _tableLayoutPanel3;
 		System::Windows::Forms::Label^ _labelQuestionNumber;
 		System::Windows::Forms::Label^ _labelQuestion;
 		array<CheckBox^>^ _aCBAnswers;
-		array<RadioButton^>^ _aRBAnswers;
 		System::Windows::Forms::Button^ _buttonNext;
 		System::Windows::Forms::Button^ _buttonQuit;
+		int CountQuestion; // количество вопросов в тесте
 	private:
 		SQLiteDataReader^ responseBD(String^ str);
 		System::Void autorizePanel();
@@ -200,12 +200,12 @@ namespace QuestCLRProject {
 			this->_tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 25)));
 			this->_tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 25)));
 			this->_tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 25)));
-			this->_tableLayoutPanel1->Size = System::Drawing::Size(284, 261);
+			this->_tableLayoutPanel1->Size = System::Drawing::Size(284, 262);
 			this->_tableLayoutPanel1->TabIndex = 0;
 			// 
 			// MasterForm
 			// 
-			this->ClientSize = System::Drawing::Size(284, 261);
+			this->ClientSize = System::Drawing::Size(284, 262);
 			this->Controls->Add(this->_tableLayoutPanel1);
 			this->KeyPreview = true;
 			this->MaximizeBox = false;
@@ -228,6 +228,8 @@ namespace QuestCLRProject {
 	private: System::Void MasterForm_Load(System::Object^ sender, System::EventArgs^ e);
 	private: System::Void toolStripButton1_Click(System::Object^ sender, System::EventArgs^ e);
 	private: System::Void dataGridView1_CellClick(System::Object^ sender, System::Windows::Forms::DataGridViewCellEventArgs^ e);
+	private: System::Void checkedChanged(System::Object^ sender, System::EventArgs^ e);
+	private: System::Void button_Next_Click(System::Object^ sender, System::EventArgs^ e);
 };
 }
 //this->Controls->Add(_logForm->tableLayoutPanel1);

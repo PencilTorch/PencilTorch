@@ -206,63 +206,158 @@ System::Void QuestCLRProject::MasterForm::toolStripButton1_Click(System::Object^
     autorizePanel();
     return System::Void();
 }
+
+System::Void QuestCLRProject::MasterForm::checkedChanged(System::Object^ sender, System::EventArgs^ e) {
+    CheckBox^ _chbx = (CheckBox^)sender;
+    /*
+    if (_chbx->Checked) {
+        if (_numAnswers == 1) {
+            for (int i = 0; i < _vSize; ++i) {
+                if (i != (int)_chbx->Tag)
+                    _aCheckBox[i]->AutoCheck = false;
+            }
+        }
+        _buttonNext->Text += " " + _chbx->Tag->ToString();//пока так
+    }
+    else {
+        for (int i = 0; i < _vSize; ++i)
+            _aCheckBox[i]->AutoCheck = true;
+    }
+    */
+    return System::Void();
+}
+
+System::Void QuestCLRProject::MasterForm::button_Next_Click(System::Object^ sender, System::EventArgs^ e) {
+
+    return System::Void();
+}
 // cell click
 System::Void QuestCLRProject::MasterForm::dataGridView1_CellClick(System::Object^ sender, System::Windows::Forms::DataGridViewCellEventArgs^ e) {
     size_t CurrentRowIndex = _dataGridView1->CurrentRow->Index + 1;
     numberQuestion = 1;
-    SQLiteDataReader^ readerCount = responseBD("SELECT COUNT(id_q) FROM answers WHERE id_q=" + numberQuestion + ";");
-    //readerCount->StepCount
-    int RowCount = 0;
-    RowCount = System::Convert::ToInt32(readerCount->GetValue(1));
+    // количество вопросов в тесте
+    SQLiteDataReader^ readerCQ = responseBD("SELECT max(id_q) FROM answers WHERE id_t=" + CurrentRowIndex + ";");
+    CountQuestion = 0;
+    if (readerCQ->HasRows) {
+        while (readerCQ->Read())
+            CountQuestion = System::Convert::ToInt32(readerCQ->GetValue(0));
+    }
+    readerCQ->Close();
+    // количество вариантов ответа
+    SQLiteDataReader^ readerCount = responseBD("SELECT COUNT(id_q) FROM answers WHERE id_q=" + numberQuestion + " AND id_t=" + CurrentRowIndex + ";");
+    int CountAnswers = 0;
+    if (readerCount->HasRows) {
+        while (readerCount->Read())
+            CountAnswers = System::Convert::ToInt32(readerCount->GetValue(0));
+    }
     readerCount->Close();
-    SQLiteDataReader^ countValidyAnswers = responseBD("SELECT COUNT(id_q) FROM answers WHERE id_q=" + numberQuestion + " AND validity = 1; ");
+    // количество правильных ответов
+    SQLiteDataReader^ countValidyAnswers = responseBD("SELECT COUNT(id_q) FROM answers WHERE id_q=" + numberQuestion + " AND id_t=" + CurrentRowIndex + " AND validity = 1;");
     int VAcount = 0;
-    VAcount = System::Convert::ToInt32(countValidyAnswers->GetValue(1));
+    if (countValidyAnswers->HasRows) {
+        while(countValidyAnswers->Read())
+            VAcount = System::Convert::ToInt32(countValidyAnswers->GetValue(0));
+    }
     countValidyAnswers->Close();
-    SQLiteDataReader^ readerQuestions = responseBD("SELECT tests_questions.question, answers.answer, answers.validity FROM tests_questions, answers WHERE tests_questions.id_t=" + CurrentRowIndex + " AND tests_questions.id_q=" + numberQuestion + " AND tests_questions.id_t = answers.id_t AND tests_questions.id_q = answers.id_q;");
+    
     /*
+    * (похоже нужен запрос о количестве вопросов в тесте, хотя бы чтобы номер вопроса не зашкаливал) +
+    Нужна структура логирования, например:
+    int autirize_id - если 0 - гость
+    string login_name
+    vector из структуры учета прохождения теста:
+        int test_id
+        vector из пары int num, bool y/n
+    При авторизации создается экземпляр структуры логирования или считывается из таблицы autorize -> logfile (придумать как)
+    если гость - ничего не создается (хотя можно для гостя одну строку держать)
+    При нажатии кнопки некст, в текущей структуре логирования в векторе учета ищется структура с текущим test_id
+    если такого нет - добавляется в вектор. В эту структуру дописывается результат.
+    Если такой тест уже был начат имеет смысл добавить: продолжить / начать заново (соответственно удалить структуру)
+    При выходе изавторизации записывать эту структуру в autorize -> logfile (придумать как)
+
+    Далее нужно плюсануть номер вопроса и повторить запрос..
+    возможно проработать этот момент пока без логирования и учета ответа
+    видимо многое вывести в функции
+    */
+    
+    // front ( напрашивается функция формирования типа _fillTLP3)
+    _tableLayoutPanel2->Controls->RemoveAt(1); //удаляю из табличного слоя2 датагридвью с тестами
+    _labelQuestionNumber = gcnew System::Windows::Forms::Label();
+    _labelQuestionNumber->Anchor = System::Windows::Forms::AnchorStyles::None;
+    _labelQuestionNumber->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
+    _labelQuestionNumber->Font = gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9.75F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
+        static_cast<System::Byte>(204));
+    _labelQuestionNumber->AutoSize = false;
+    _labelQuestionNumber->Dock = System::Windows::Forms::DockStyle::Fill;
+    _labelQuestionNumber->Text = L"Вопрос № " + numberQuestion;
+    _labelQuestion = gcnew System::Windows::Forms::Label();
+    _labelQuestion->AutoSize = false;
+    _labelQuestion->Dock = System::Windows::Forms::DockStyle::Fill;
+    _aCBAnswers = gcnew array<System::Windows::Forms::CheckBox^>(CountAnswers);
+    for (int i = 0; i < CountAnswers; ++i) {
+        _aCBAnswers[i] = gcnew System::Windows::Forms::CheckBox();
+        _aCBAnswers[i]->AutoSize = false;
+        _aCBAnswers[i]->Dock = System::Windows::Forms::DockStyle::Fill;
+        _aCBAnswers[i]->Tag = i;
+        _aCBAnswers[i]->CheckedChanged += gcnew System::EventHandler(this, &MasterForm::checkedChanged);
+    }
+    _buttonNext = gcnew System::Windows::Forms::Button();
+    _buttonNext->Text = L"Далее >>";
+    _buttonNext->AutoSize = false;
+    _buttonNext->Size = System::Drawing::Size(150, 26);
+    _buttonNext->Margin = System::Windows::Forms::Padding(25, 3, 3, 3);
+    _buttonNext->Click += gcnew System::EventHandler(this, &MasterForm::button_Next_Click);
+    _buttonQuit = gcnew System::Windows::Forms::Button();
+    _buttonQuit->Text = L"Отмена";
+    _buttonQuit->AutoSize = false;
+    _buttonQuit->Size = System::Drawing::Size(150, 26);
+    _buttonQuit->Margin = System::Windows::Forms::Padding(25, 3, 3, 3);
+    _tableLayoutPanel3 = gcnew System::Windows::Forms::TableLayoutPanel();
+    _tableLayoutPanel3->AutoSize = false;
+    _tableLayoutPanel3->Dock = System::Windows::Forms::DockStyle::Fill;
+    _tableLayoutPanel3->ColumnCount = 2;
+    _tableLayoutPanel3->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent, 50)));
+    _tableLayoutPanel3->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent, 50)));
+    int RowCountAnswers = CountAnswers / 2;
+    if (RowCountAnswers < 2) RowCountAnswers = 1;
+    _tableLayoutPanel3->RowCount = RowCountAnswers + 3; // + номер вопроса, вопрос и строка под кнопки
+    _tableLayoutPanel3->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 50)));
+    _tableLayoutPanel3->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 60)));
+    for (int i = 0; i < RowCountAnswers; ++i)
+        _tableLayoutPanel3->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 10)));
+    _tableLayoutPanel3->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 30)));
+    _tableLayoutPanel3->Controls->Add(_labelQuestionNumber, 0, 0);
+    _tableLayoutPanel3->SetColumnSpan(_labelQuestionNumber, 2);
+    _tableLayoutPanel3->Controls->Add(_labelQuestion, 0, 1);
+    _tableLayoutPanel3->SetColumnSpan(_labelQuestion, 2);
+    for (int i = 0, c = 0, r = 2; i < CountAnswers; ++i) {
+        (i % 2 == 0) ? c = 0 : c = 1;
+        _tableLayoutPanel3->Controls->Add(_aCBAnswers[i], c, r);
+        if (c == 1)
+            r++;
+    }
+    _tableLayoutPanel3->Controls->Add(_buttonQuit, 0, RowCountAnswers + 2);
+    _tableLayoutPanel3->Controls->Add(_buttonNext, 1, RowCountAnswers + 2);
+    _tableLayoutPanel2->Controls->Add(_tableLayoutPanel3, 0, 1);
+    //front end
+    
+    // основной запрос вопроса, ответов и какой/какие из них правильные
+    SQLiteDataReader^ readerQuestions = responseBD("SELECT tests_questions.question, answers.answer, answers.validity FROM tests_questions, answers WHERE tests_questions.id_t=" + CurrentRowIndex + " AND tests_questions.id_q=" + numberQuestion + " AND tests_questions.id_t = answers.id_t AND tests_questions.id_q = answers.id_q;");
     if (readerQuestions->HasRows) {
-        //label3->Text += Convert::ToString(CurrentRowIndex); //номер вопроса
-        cliext::vector<String^>^ vQuestions = gcnew cliext::vector<String^>();
+        int numAns = 0;
         while (readerQuestions->Read()) {
             for (int colCtr = 0; colCtr < readerQuestions->FieldCount; ++colCtr) {
-                if (vQuestions->empty() && colCtr == 0)
-                    vQuestions->push_back(readerQuestions->GetValue(colCtr)->ToString());
-                else if (!vQuestions->empty() && colCtr == 0)
+                if (_labelQuestion->Text == "" && colCtr == 0)
+                    _labelQuestion->Text = readerQuestions->GetValue(colCtr)->ToString();
+                else if (_labelQuestion->Text != "" && colCtr == 0)
                     continue;
-                else
-                    vQuestions->push_back(readerQuestions->GetValue(colCtr)->ToString());
+                else if (colCtr == 1)
+                    _aCBAnswers[numAns]->Text = readerQuestions->GetValue(colCtr)->ToString();
+                // validity добавить
             }
+            ++numAns;
         }
-        */
-        _tableLayoutPanel2->Controls->RemoveAt(1); //удаляю из табличного слоя2 датагридвью с тестами
-        Label^ _lbl = gcnew Label();
-        _lbl->Text = L"Количество ответов: " + RowCount + L"; из них правильных: " + VAcount;
-        _tableLayoutPanel2->Controls->Add(_lbl, 0, 1);
-
-        //TestTemplTable^ _ttt = gcnew TestTemplTable((vQuestions->size() - 1) / 2); //размер для шаблона без вопроса и правильности ответа
-       // _ttt->setNumberQuestion(numberQuestion); //номер вопроса
-        //_ttt->setQuestion(vQuestions[0]); //вопрос
-        //считывание вектора с ответами и количеством правильных
-        /*
-        int countValidyAnswers = 0;
-        for (int i = 1, num = 0; i < vQuestions->size(); ++i) {
-            if (i % 2 == 0) {
-                countValidyAnswers += Convert::ToInt32(vQuestions[i]); // счет правильных
-            }
-            else {
-                //_ttt->setAnswers(vQuestions[i], num); // запись в массив ответов
-                ++num;
-            }
-        }
-        */
-       // _ttt->setOneOrMany(countValidyAnswers); // запись количества правильных ответов
-        // добавление табличного слоя к форме
-        //this->Controls->Add(_ttt->_tableLayoutPanel1);
-        //panelHome->Visible = false;
-        //_ttt->setVisible(true);
-        //}
-    
+    }
     readerQuestions->Close();
 
     return System::Void();
