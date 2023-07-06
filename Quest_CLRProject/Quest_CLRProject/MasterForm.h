@@ -78,9 +78,14 @@ namespace QuestCLRProject {
 		System::Windows::Forms::Button^ _buttonNext;
 		System::Windows::Forms::Button^ _buttonQuit;
 		int CountQuestion; // количество вопросов в тесте
+		int CountAnswers; // количество ответов в вопросе
+		int VAcount; // количество правильных ответов
 	private:
 		SQLiteDataReader^ responseBD(String^ str);
 		System::Void autorizePanel();
+		System::Void fillTLP2();
+		System::Void fillTLP3();
+		System::Void clearTLP3();
 
 		/// <summary>
 		/// Обязательная переменная конструктора.
