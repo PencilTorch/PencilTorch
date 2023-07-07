@@ -85,7 +85,7 @@ System::Void QuestCLRProject::MasterForm::fillTLP3() {
     }
     _tableLayoutPanel3->Controls->Add(_buttonQuit, 0, RowCountAnswers + 2);
     _tableLayoutPanel3->Controls->Add(_buttonNext, 1, RowCountAnswers + 2);
-
+    _buttonNext->Enabled = false;
     return System::Void();
 }
 
@@ -199,6 +199,7 @@ System::Void QuestCLRProject::MasterForm::MasterForm_Load(System::Object^ sender
 // exit into autorize
 System::Void QuestCLRProject::MasterForm::toolStripButton1_Click(System::Object^ sender, System::EventArgs^ e) {
     autorizePanel();
+    _toolStripStatusLabel1->Text = "";
     return System::Void();
 }
 
@@ -225,49 +226,53 @@ System::Void QuestCLRProject::MasterForm::checkedChanged(System::Object^ sender,
 
 // кнопка далее (следующий вопрос)
 System::Void QuestCLRProject::MasterForm::button_Next_Click(System::Object^ sender, System::EventArgs^ e) {
-    _tableLayoutPanel2->SuspendLayout();
-    clearTLP3();
-    _tableLayoutPanel2->Controls->Remove(_tableLayoutPanel3);
-    ++numberQuestion;
-    _toolStripStatusLabel1->Text = numberQuestion + L" из " + CountQuestion;
-    // количество вариантов ответа
-    SQLiteDataReader^ readerCount = responseBD("SELECT COUNT(id_q) FROM answers WHERE id_q=" + numberQuestion + " AND id_t=" + CurrentRowIndex + ";");
-    CountAnswers = 0;
-    if (readerCount->HasRows) {
-        while (readerCount->Read())
-            CountAnswers = System::Convert::ToInt32(readerCount->GetValue(0));
-    }
-    readerCount->Close();
-    // количество правильных ответов
-    SQLiteDataReader^ countValidyAnswers = responseBD("SELECT COUNT(id_q) FROM answers WHERE id_q=" + numberQuestion + " AND id_t=" + CurrentRowIndex + " AND validity = 1;");
-    VAcount = 0;
-    if (countValidyAnswers->HasRows) {
-        while (countValidyAnswers->Read())
-            VAcount = System::Convert::ToInt32(countValidyAnswers->GetValue(0));
-    }
-    countValidyAnswers->Close();
-    fillTLP3();    
-    _tableLayoutPanel2->Controls->Add(_tableLayoutPanel3, 0, 1);
-    _tableLayoutPanel2->SetColumnSpan(_tableLayoutPanel3, 2);
-
-    SQLiteDataReader^ readerQuestions = responseBD("SELECT tests_questions.question, answers.answer, answers.validity FROM tests_questions, answers WHERE tests_questions.id_t=" + CurrentRowIndex + " AND tests_questions.id_q=" + numberQuestion + " AND tests_questions.id_t = answers.id_t AND tests_questions.id_q = answers.id_q;");
-    if (readerQuestions->HasRows) {
-        int numAns = 0;
-        while (readerQuestions->Read()) {
-            for (int colCtr = 0; colCtr < readerQuestions->FieldCount; ++colCtr) {
-                if (_labelQuestion->Text == "" && colCtr == 0)
-                    _labelQuestion->Text = readerQuestions->GetValue(colCtr)->ToString();
-                else if (_labelQuestion->Text != "" && colCtr == 0)
-                    continue;
-                else if (colCtr == 1)
-                    _vCBAnswers[numAns]->Text = readerQuestions->GetValue(colCtr)->ToString();
-                // validity добавить
-            }
-            ++numAns;
+    if (numberQuestion < CountQuestion) {
+        _tableLayoutPanel2->SuspendLayout();
+        clearTLP3();
+        _tableLayoutPanel2->Controls->Remove(_tableLayoutPanel3);
+        // количество вариантов ответа
+        SQLiteDataReader^ readerCount = responseBD("SELECT COUNT(id_q) FROM answers WHERE id_q=" + numberQuestion + " AND id_t=" + CurrentRowIndex + ";");
+        CountAnswers = 0;
+        if (readerCount->HasRows) {
+            while (readerCount->Read())
+                CountAnswers = System::Convert::ToInt32(readerCount->GetValue(0));
         }
+        readerCount->Close();
+        // количество правильных ответов
+        SQLiteDataReader^ countValidyAnswers = responseBD("SELECT COUNT(id_q) FROM answers WHERE id_q=" + numberQuestion + " AND id_t=" + CurrentRowIndex + " AND validity = 1;");
+        VAcount = 0;
+        if (countValidyAnswers->HasRows) {
+            while (countValidyAnswers->Read())
+                VAcount = System::Convert::ToInt32(countValidyAnswers->GetValue(0));
+        }
+        countValidyAnswers->Close();
+        fillTLP3();
+        _tableLayoutPanel2->Controls->Add(_tableLayoutPanel3, 0, 1);
+        _tableLayoutPanel2->SetColumnSpan(_tableLayoutPanel3, 2);
+
+        SQLiteDataReader^ readerQuestions = responseBD("SELECT tests_questions.question, answers.answer, answers.validity FROM tests_questions, answers WHERE tests_questions.id_t=" + CurrentRowIndex + " AND tests_questions.id_q=" + numberQuestion + " AND tests_questions.id_t = answers.id_t AND tests_questions.id_q = answers.id_q;");
+        if (readerQuestions->HasRows) {
+            int numAns = 0;
+            while (readerQuestions->Read()) {
+                for (int colCtr = 0; colCtr < readerQuestions->FieldCount; ++colCtr) {
+                    if (_labelQuestion->Text == "" && colCtr == 0)
+                        _labelQuestion->Text = readerQuestions->GetValue(colCtr)->ToString();
+                    else if (_labelQuestion->Text != "" && colCtr == 0)
+                        continue;
+                    else if (colCtr == 1)
+                        _vCBAnswers[numAns]->Text = readerQuestions->GetValue(colCtr)->ToString();
+                    // validity добавить
+                }
+                ++numAns;
+            }
+        }
+        readerQuestions->Close();
+        _toolStripStatusLabel1->Text = numberQuestion + L" из " + CountQuestion;
+        _tableLayoutPanel2->ResumeLayout();
+        numberQuestion++;
     }
-    readerQuestions->Close();
-    _tableLayoutPanel2->ResumeLayout();
+    
+
     return System::Void();
 }
 // cell click
@@ -282,7 +287,6 @@ System::Void QuestCLRProject::MasterForm::dataGridView1_CellClick(System::Object
             CountQuestion = System::Convert::ToInt32(readerCQ->GetValue(0));
     }
     readerCQ->Close();
-    _toolStripStatusLabel1->Text = numberQuestion + L" из " + CountQuestion;
     // количество вариантов ответа
     SQLiteDataReader^ readerCount = responseBD("SELECT COUNT(id_q) FROM answers WHERE id_q=" + numberQuestion + " AND id_t=" + CurrentRowIndex + ";");
     CountAnswers = 0;
@@ -345,8 +349,10 @@ System::Void QuestCLRProject::MasterForm::dataGridView1_CellClick(System::Object
         }
     }
     readerQuestions->Close();
-
+    _toolStripStatusLabel1->Text = numberQuestion + L" из " + CountQuestion;
     _tableLayoutPanel2->ResumeLayout();
+    numberQuestion++;
+
     return System::Void();
 }
 
