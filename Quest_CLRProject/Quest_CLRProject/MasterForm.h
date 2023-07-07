@@ -26,14 +26,122 @@ namespace QuestCLRProject {
 			fileName = "tests.db3";
 			db = gcnew SQLiteConnection();
 			logInfo = gcnew cliext::vector<String^>();
+			_vCBAnswers = gcnew cliext::vector<CheckBox^>();
+			//TLP2
+			// toolStripButton1
+			this->toolStripButton1 = (gcnew System::Windows::Forms::ToolStripButton());
+			this->toolStripButton1->Name = L"toolStripButton1";
+			this->toolStripButton1->Alignment = System::Windows::Forms::ToolStripItemAlignment::Right;
+			this->toolStripButton1->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::ImageAndText;
+			//this->toolStripButton1->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"toolStripButton1.Image")));
+			this->toolStripButton1->ImageTransparentColor = System::Drawing::Color::Magenta;
+			this->toolStripButton1->Size = System::Drawing::Size(100, 25);
+			this->toolStripButton1->Text = L"Выйти";
+			this->toolStripButton1->TextImageRelation = System::Windows::Forms::TextImageRelation::TextBeforeImage;
+			this->toolStripButton1->Click += gcnew System::EventHandler(this, &MasterForm::toolStripButton1_Click);
+			// toolStripLabel1
+			_toolStripLabel1 = gcnew System::Windows::Forms::ToolStripLabel();
+			_toolStripLabel1->Alignment = System::Windows::Forms::ToolStripItemAlignment::Right;
+			// toolStrip1
+			_toolStrip1 = gcnew System::Windows::Forms::ToolStrip();
+			_toolStrip1->Name = L"toolStrip1";
+			_toolStrip1->AutoSize = true;
+			_toolStrip1->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Right
+				| System::Windows::Forms::AnchorStyles::Left));
+			_toolStrip1->Dock = System::Windows::Forms::DockStyle::Fill;
+			_toolStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(2) { this->toolStripButton1, this->_toolStripLabel1 });
+			// _toolStripStatusLabel1
+			_toolStripStatusLabel1 = gcnew System::Windows::Forms::ToolStripStatusLabel();
+			_toolStripStatusLabel1->Alignment = System::Windows::Forms::ToolStripItemAlignment::Left;
+			// _statusStrip1
+			_statusStrip1 = gcnew System::Windows::Forms::StatusStrip();
+			_statusStrip1->Name = L"_statusStrip1";
+			_statusStrip1->AutoSize = true;
+			_statusStrip1->Dock = System::Windows::Forms::DockStyle::Fill;
+			_statusStrip1->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right
+				| System::Windows::Forms::AnchorStyles::Left));
+			_statusStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->_toolStripStatusLabel1 });
+			//dataGridView1
+			_dataGridView1 = gcnew System::Windows::Forms::DataGridView();
+			_dataGridView1->Name = L"dataGridView1";
+			_dataGridView1->AutoSize = true;
+			_dataGridView1->AllowUserToAddRows = false;
+			_dataGridView1->AllowUserToDeleteRows = false;
+			_dataGridView1->AllowUserToResizeColumns = false;
+			_dataGridView1->AllowUserToResizeRows = false;
+			_dataGridView1->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
+				| System::Windows::Forms::AnchorStyles::Right));
+			_dataGridView1->AutoSizeColumnsMode = System::Windows::Forms::DataGridViewAutoSizeColumnsMode::Fill;
+			_dataGridView1->BackgroundColor = System::Drawing::SystemColors::Menu;
+			_dataGridView1->BorderStyle = System::Windows::Forms::BorderStyle::None;
+			_dataGridView1->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
+			_dataGridView1->ColumnHeadersVisible = false;
+			_dataGridView1->Cursor = System::Windows::Forms::Cursors::Default;
+			_dataGridView1->EditMode = System::Windows::Forms::DataGridViewEditMode::EditOnEnter;
+			_dataGridView1->MultiSelect = false;
+			_dataGridView1->ReadOnly = true;
+			_dataGridView1->RowHeadersVisible = false;
+			_dataGridView1->SelectionMode = System::Windows::Forms::DataGridViewSelectionMode::CellSelect;
+			_dataGridView1->CellClick += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &MasterForm::dataGridView1_CellClick);
+			//dataGridView1->CellMouseEnter += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &MyForm::dataGridView1_CellMouseEnter);
+			//dataGridView1->CellMouseLeave += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &MyForm::dataGridView1_CellMouseLeave);
+			// _tableLayoutPanel2
+			_tableLayoutPanel2 = gcnew System::Windows::Forms::TableLayoutPanel();
+			_tableLayoutPanel2->Name = L"_tableLayoutPanel2";
+			_tableLayoutPanel2->Location = System::Drawing::Point(0, 0);
+			_tableLayoutPanel2->AutoSize = true;
+			_tableLayoutPanel2->Dock = System::Windows::Forms::DockStyle::Fill;
+			_tableLayoutPanel2->ColumnCount = 1;
+			_tableLayoutPanel2->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent, 100)));
+			_tableLayoutPanel2->RowCount = 3;
+			_tableLayoutPanel2->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 25)));
+			_tableLayoutPanel2->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 90)));
+			_tableLayoutPanel2->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 25)));
+			//_tableLayoutPanel2->Controls->AddRange(gcnew cli::array< System::Windows::Forms::Control^  >(3) { _toolStrip1 , _dataGridView1, _statusStrip1 });
+			_tableLayoutPanel2->BorderStyle = BorderStyle::FixedSingle;
+			// 
+			//TLP3
+			_labelQuestionNumber = gcnew System::Windows::Forms::Label();
+			_labelQuestionNumber->Anchor = System::Windows::Forms::AnchorStyles::None;
+			_labelQuestionNumber->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
+			_labelQuestionNumber->Font = gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9.75F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(204));
+			_labelQuestionNumber->AutoSize = false;
+			_labelQuestionNumber->Dock = System::Windows::Forms::DockStyle::Fill;
+			
+			_labelQuestion = gcnew System::Windows::Forms::Label();
+			_labelQuestion->AutoSize = false;
+			_labelQuestion->Dock = System::Windows::Forms::DockStyle::Fill;
 
+			_buttonNext = gcnew System::Windows::Forms::Button();
+			_buttonNext->Text = L"Далее >>";
+			_buttonNext->AutoSize = false;
+			_buttonNext->Size = System::Drawing::Size(150, 26);
+			_buttonNext->Margin = System::Windows::Forms::Padding(25, 3, 3, 3);
+			_buttonNext->Enabled = false;
+			_buttonNext->Click += gcnew System::EventHandler(this, &MasterForm::button_Next_Click);
 
+			_buttonQuit = gcnew System::Windows::Forms::Button();
+			_buttonQuit->Text = L"Отмена";
+			_buttonQuit->AutoSize = false;
+			_buttonQuit->Size = System::Drawing::Size(150, 26);
+			_buttonQuit->Margin = System::Windows::Forms::Padding(25, 3, 3, 3);
+
+			_tableLayoutPanel3 = gcnew System::Windows::Forms::TableLayoutPanel();
+			_tableLayoutPanel3->AutoSize = false;
+			_tableLayoutPanel3->Dock = System::Windows::Forms::DockStyle::Fill;
+			_tableLayoutPanel3->ColumnCount = 2;
+			_tableLayoutPanel3->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent, 50)));
+			_tableLayoutPanel3->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent, 50)));
+			
 			InitializeComponent();
 		}
 
 		~MasterForm()
 		{
 			db->Close();
+			logInfo->clear();
+			_vCBAnswers->clear();
 			if (components)
 			{
 				delete components;
@@ -68,13 +176,16 @@ namespace QuestCLRProject {
 		System::Windows::Forms::StatusStrip^ _statusStrip1;
 		System::Windows::Forms::ToolStripLabel^ _toolStripLabel1;
 		System::Windows::Forms::ToolStripButton^ toolStripButton1;
+		System::Windows::Forms::ToolStripStatusLabel^ _toolStripStatusLabel1;
 		System::Windows::Forms::DataGridView^ _dataGridView1;
+		size_t CurrentRowIndex; // индекс строки выбранного теста
 		size_t numberQuestion; //номер вопроса
 		// выбранный тест
 		System::Windows::Forms::TableLayoutPanel^ _tableLayoutPanel3;
 		System::Windows::Forms::Label^ _labelQuestionNumber;
 		System::Windows::Forms::Label^ _labelQuestion;
-		array<CheckBox^>^ _aCBAnswers;
+		//array<CheckBox^>^ _aCBAnswers;
+		cliext::vector<CheckBox^>^ _vCBAnswers;
 		System::Windows::Forms::Button^ _buttonNext;
 		System::Windows::Forms::Button^ _buttonQuit;
 		int CountQuestion; // количество вопросов в тесте

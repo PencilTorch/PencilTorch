@@ -31,6 +31,7 @@ System::Void QuestCLRProject::MasterForm::autorizePanel() {
     Top = (sz.Height - Height) / 2;
     Left = (sz.Width - Width) / 2;
     //cleaning
+    _tableLayoutPanel2->Controls->Clear();
     this->Controls->Clear();
     logInfo->clear();
     _toolStripLabel1->Text = "";
@@ -45,115 +46,25 @@ System::Void QuestCLRProject::MasterForm::autorizePanel() {
 }
 // подготовка _tableLayoutPanel2
 System::Void QuestCLRProject::MasterForm::fillTLP2() {
-    // toolStripButton1
-    this->toolStripButton1 = (gcnew System::Windows::Forms::ToolStripButton());
-    this->toolStripButton1->Name = L"toolStripButton1";
-    this->toolStripButton1->Alignment = System::Windows::Forms::ToolStripItemAlignment::Right;
-    this->toolStripButton1->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::ImageAndText;
-    //this->toolStripButton1->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"toolStripButton1.Image")));
-    this->toolStripButton1->ImageTransparentColor = System::Drawing::Color::Magenta;
-    this->toolStripButton1->Size = System::Drawing::Size(100, 25);
-    this->toolStripButton1->Text = L"¬ыйти";
-    this->toolStripButton1->TextImageRelation = System::Windows::Forms::TextImageRelation::TextBeforeImage;
-    this->toolStripButton1->Click += gcnew System::EventHandler(this, &MasterForm::toolStripButton1_Click);
-    // toolStripLabel1
-    _toolStripLabel1 = gcnew System::Windows::Forms::ToolStripLabel();
-    _toolStripLabel1->Alignment = System::Windows::Forms::ToolStripItemAlignment::Right;
-    // toolStrip1
-    _toolStrip1 = gcnew System::Windows::Forms::ToolStrip();
-    _toolStrip1->Name = L"toolStrip1";
-    _toolStrip1->AutoSize = true;
-    _toolStrip1->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Right
-        | System::Windows::Forms::AnchorStyles::Left));
-    _toolStrip1->Dock = System::Windows::Forms::DockStyle::Fill;
-    _toolStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(2) { this->toolStripButton1, this->_toolStripLabel1 });
-    // _statusStrip1
-    _statusStrip1 = gcnew System::Windows::Forms::StatusStrip();
-    _statusStrip1->Name = L"_statusStrip1";
-    _statusStrip1->AutoSize = true;
-    _statusStrip1->Dock = System::Windows::Forms::DockStyle::Fill;
-    _statusStrip1->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((System::Windows::Forms::AnchorStyles::Bottom | System::Windows::Forms::AnchorStyles::Right
-        | System::Windows::Forms::AnchorStyles::Left));
-    //dataGridView1
-    _dataGridView1 = gcnew System::Windows::Forms::DataGridView();
-    _dataGridView1->Name = L"dataGridView1";
-    _dataGridView1->AutoSize = true;
-    _dataGridView1->AllowUserToAddRows = false;
-    _dataGridView1->AllowUserToDeleteRows = false;
-    _dataGridView1->AllowUserToResizeColumns = false;
-    _dataGridView1->AllowUserToResizeRows = false;
-    _dataGridView1->Anchor = static_cast<System::Windows::Forms::AnchorStyles>(((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Left)
-        | System::Windows::Forms::AnchorStyles::Right));
-    _dataGridView1->AutoSizeColumnsMode = System::Windows::Forms::DataGridViewAutoSizeColumnsMode::Fill;
-    _dataGridView1->BackgroundColor = System::Drawing::SystemColors::Menu;
-    _dataGridView1->BorderStyle = System::Windows::Forms::BorderStyle::None;
-    _dataGridView1->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
-    _dataGridView1->ColumnHeadersVisible = false;
-    _dataGridView1->Cursor = System::Windows::Forms::Cursors::Default;
-    _dataGridView1->EditMode = System::Windows::Forms::DataGridViewEditMode::EditOnEnter;
-    _dataGridView1->MultiSelect = false;
-    _dataGridView1->ReadOnly = true;
-    _dataGridView1->RowHeadersVisible = false;
-    _dataGridView1->SelectionMode = System::Windows::Forms::DataGridViewSelectionMode::CellSelect;
-    _dataGridView1->CellClick += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &MasterForm::dataGridView1_CellClick);
-    //dataGridView1->CellMouseEnter += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &MyForm::dataGridView1_CellMouseEnter);
-    //dataGridView1->CellMouseLeave += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &MyForm::dataGridView1_CellMouseLeave);
-    // _tableLayoutPanel2
-    _tableLayoutPanel2 = gcnew System::Windows::Forms::TableLayoutPanel();
-    _tableLayoutPanel2->Name = L"_tableLayoutPanel2";
-    _tableLayoutPanel2->Location = System::Drawing::Point(0, 0);
-    _tableLayoutPanel2->AutoSize = true;
-    _tableLayoutPanel2->Dock = System::Windows::Forms::DockStyle::Fill;
-    _tableLayoutPanel2->ColumnCount = 1;
-    _tableLayoutPanel2->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent, 100)));
-    _tableLayoutPanel2->RowCount = 3;
-    _tableLayoutPanel2->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 25)));
-    _tableLayoutPanel2->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 90)));
-    _tableLayoutPanel2->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 25)));
     _tableLayoutPanel2->Controls->Add(_toolStrip1, 0, 0);
+    _tableLayoutPanel2->SetColumnSpan(_toolStrip1, 2);
     _tableLayoutPanel2->Controls->Add(_dataGridView1, 0, 1);
+    _tableLayoutPanel2->SetColumnSpan(_dataGridView1, 2);
     _tableLayoutPanel2->Controls->Add(_statusStrip1, 0, 2);
-
+    _tableLayoutPanel2->SetColumnSpan(_statusStrip1, 2);
     return System::Void();
 }
 // подготовка _tableLayoutPanel3 под вариант вопроса
 System::Void QuestCLRProject::MasterForm::fillTLP3() {
-    _labelQuestionNumber = gcnew System::Windows::Forms::Label();
-    _labelQuestionNumber->Anchor = System::Windows::Forms::AnchorStyles::None;
-    _labelQuestionNumber->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
-    _labelQuestionNumber->Font = gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9.75F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
-        static_cast<System::Byte>(204));
-    _labelQuestionNumber->AutoSize = false;
-    _labelQuestionNumber->Dock = System::Windows::Forms::DockStyle::Fill;
     _labelQuestionNumber->Text = L"¬опрос є " + numberQuestion;
-    _labelQuestion = gcnew System::Windows::Forms::Label();
-    _labelQuestion->AutoSize = false;
-    _labelQuestion->Dock = System::Windows::Forms::DockStyle::Fill;
-    _aCBAnswers = gcnew array<System::Windows::Forms::CheckBox^>(CountAnswers);
     for (int i = 0; i < CountAnswers; ++i) {
-        _aCBAnswers[i] = gcnew System::Windows::Forms::CheckBox();
-        _aCBAnswers[i]->AutoSize = false;
-        _aCBAnswers[i]->Dock = System::Windows::Forms::DockStyle::Fill;
-        _aCBAnswers[i]->Tag = i;
-        _aCBAnswers[i]->CheckedChanged += gcnew System::EventHandler(this, &MasterForm::checkedChanged);
+        CheckBox^ chbTMP = gcnew System::Windows::Forms::CheckBox();
+        chbTMP->AutoSize = false;
+        chbTMP->Dock = System::Windows::Forms::DockStyle::Fill;
+        chbTMP->Tag = i;
+        chbTMP->CheckedChanged += gcnew System::EventHandler(this, &MasterForm::checkedChanged);
+        _vCBAnswers->push_back(chbTMP);
     }
-    _buttonNext = gcnew System::Windows::Forms::Button();
-    _buttonNext->Text = L"ƒалее >>";
-    _buttonNext->AutoSize = false;
-    _buttonNext->Size = System::Drawing::Size(150, 26);
-    _buttonNext->Margin = System::Windows::Forms::Padding(25, 3, 3, 3);
-    _buttonNext->Click += gcnew System::EventHandler(this, &MasterForm::button_Next_Click);
-    _buttonQuit = gcnew System::Windows::Forms::Button();
-    _buttonQuit->Text = L"ќтмена";
-    _buttonQuit->AutoSize = false;
-    _buttonQuit->Size = System::Drawing::Size(150, 26);
-    _buttonQuit->Margin = System::Windows::Forms::Padding(25, 3, 3, 3);
-    _tableLayoutPanel3 = gcnew System::Windows::Forms::TableLayoutPanel();
-    _tableLayoutPanel3->AutoSize = false;
-    _tableLayoutPanel3->Dock = System::Windows::Forms::DockStyle::Fill;
-    _tableLayoutPanel3->ColumnCount = 2;
-    _tableLayoutPanel3->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent, 50)));
-    _tableLayoutPanel3->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent, 50)));
     int RowCountAnswers = CountAnswers / 2;
     if (RowCountAnswers < 2) RowCountAnswers = 1;
     _tableLayoutPanel3->RowCount = RowCountAnswers + 3; // + номер вопроса, вопрос и строка под кнопки
@@ -168,7 +79,7 @@ System::Void QuestCLRProject::MasterForm::fillTLP3() {
     _tableLayoutPanel3->SetColumnSpan(_labelQuestion, 2);
     for (int i = 0, c = 0, r = 2; i < CountAnswers; ++i) {
         (i % 2 == 0) ? c = 0 : c = 1;
-        _tableLayoutPanel3->Controls->Add(_aCBAnswers[i], c, r);
+        _tableLayoutPanel3->Controls->Add(_vCBAnswers[i], c, r);
         if (c == 1)
             r++;
     }
@@ -179,21 +90,20 @@ System::Void QuestCLRProject::MasterForm::fillTLP3() {
 }
 
 System::Void QuestCLRProject::MasterForm::clearTLP3() {
-    _aCBAnswers->Clear;
+    _tableLayoutPanel3->SuspendLayout();
+    --CountAnswers;
+    for (; 0 <= CountAnswers; --CountAnswers) {
+        _tableLayoutPanel3->Controls->Remove(_vCBAnswers[CountAnswers]);
+        _vCBAnswers->pop_back();
+    } 
+    _vCBAnswers->clear();
     _labelQuestionNumber->Text = "";
     _labelQuestion->Text = "";
-    _tableLayoutPanel3->Controls->Remove(_labelQuestionNumber);
-    _tableLayoutPanel3->Controls->Remove(_labelQuestion);
-    for (int i = 0; i < CountAnswers; ++i)
-        _tableLayoutPanel3->Controls->Remove(_aCBAnswers[i]);
-    _tableLayoutPanel3->Controls->Remove(_buttonQuit);
-    _tableLayoutPanel3->Controls->Remove(_buttonNext);
     _tableLayoutPanel3->Controls->Clear();
-    _tableLayoutPanel3->RowCount = 0;
-    _tableLayoutPanel3->ColumnCount = 0;
+    _tableLayoutPanel3->RowCount = 1;
     CountAnswers = 0;
     VAcount = 0;
-
+    _tableLayoutPanel3->ResumeLayout();
     return System::Void();
 }
 
@@ -298,29 +208,71 @@ System::Void QuestCLRProject::MasterForm::checkedChanged(System::Object^ sender,
         if (VAcount == 1) {
             for (int i = 0; i < CountAnswers; ++i) {
                 if (i != (int)_chbx->Tag)
-                    _aCBAnswers[i]->AutoCheck = false;
+                    _vCBAnswers[i]->AutoCheck = false;
             }
         }
+        _buttonNext->Enabled = true;
         //_buttonNext->Text += " " + _chbx->Tag->ToString();//пока так
     }
     else {
         for (int i = 0; i < CountAnswers; ++i)
-            _aCBAnswers[i]->AutoCheck = true;
+            _vCBAnswers[i]->AutoCheck = true;
+        _buttonNext->Enabled = false;
     }
 
     return System::Void();
 }
 
+// кнопка далее (следующий вопрос)
 System::Void QuestCLRProject::MasterForm::button_Next_Click(System::Object^ sender, System::EventArgs^ e) {
-    ++numberQuestion;
-
-    
+    _tableLayoutPanel2->SuspendLayout();
     clearTLP3();
+    _tableLayoutPanel2->Controls->Remove(_tableLayoutPanel3);
+    ++numberQuestion;
+    _toolStripStatusLabel1->Text = numberQuestion + L" из " + CountQuestion;
+    // количество вариантов ответа
+    SQLiteDataReader^ readerCount = responseBD("SELECT COUNT(id_q) FROM answers WHERE id_q=" + numberQuestion + " AND id_t=" + CurrentRowIndex + ";");
+    CountAnswers = 0;
+    if (readerCount->HasRows) {
+        while (readerCount->Read())
+            CountAnswers = System::Convert::ToInt32(readerCount->GetValue(0));
+    }
+    readerCount->Close();
+    // количество правильных ответов
+    SQLiteDataReader^ countValidyAnswers = responseBD("SELECT COUNT(id_q) FROM answers WHERE id_q=" + numberQuestion + " AND id_t=" + CurrentRowIndex + " AND validity = 1;");
+    VAcount = 0;
+    if (countValidyAnswers->HasRows) {
+        while (countValidyAnswers->Read())
+            VAcount = System::Convert::ToInt32(countValidyAnswers->GetValue(0));
+    }
+    countValidyAnswers->Close();
+    fillTLP3();    
+    _tableLayoutPanel2->Controls->Add(_tableLayoutPanel3, 0, 1);
+    _tableLayoutPanel2->SetColumnSpan(_tableLayoutPanel3, 2);
+
+    SQLiteDataReader^ readerQuestions = responseBD("SELECT tests_questions.question, answers.answer, answers.validity FROM tests_questions, answers WHERE tests_questions.id_t=" + CurrentRowIndex + " AND tests_questions.id_q=" + numberQuestion + " AND tests_questions.id_t = answers.id_t AND tests_questions.id_q = answers.id_q;");
+    if (readerQuestions->HasRows) {
+        int numAns = 0;
+        while (readerQuestions->Read()) {
+            for (int colCtr = 0; colCtr < readerQuestions->FieldCount; ++colCtr) {
+                if (_labelQuestion->Text == "" && colCtr == 0)
+                    _labelQuestion->Text = readerQuestions->GetValue(colCtr)->ToString();
+                else if (_labelQuestion->Text != "" && colCtr == 0)
+                    continue;
+                else if (colCtr == 1)
+                    _vCBAnswers[numAns]->Text = readerQuestions->GetValue(colCtr)->ToString();
+                // validity добавить
+            }
+            ++numAns;
+        }
+    }
+    readerQuestions->Close();
+    _tableLayoutPanel2->ResumeLayout();
     return System::Void();
 }
 // cell click
 System::Void QuestCLRProject::MasterForm::dataGridView1_CellClick(System::Object^ sender, System::Windows::Forms::DataGridViewCellEventArgs^ e) {
-    size_t CurrentRowIndex = _dataGridView1->CurrentRow->Index + 1;
+    CurrentRowIndex = _dataGridView1->CurrentRow->Index + 1;
     numberQuestion = 1;
     // количество вопросов в тесте
     SQLiteDataReader^ readerCQ = responseBD("SELECT max(id_q) FROM answers WHERE id_t=" + CurrentRowIndex + ";");
@@ -330,6 +282,7 @@ System::Void QuestCLRProject::MasterForm::dataGridView1_CellClick(System::Object
             CountQuestion = System::Convert::ToInt32(readerCQ->GetValue(0));
     }
     readerCQ->Close();
+    _toolStripStatusLabel1->Text = numberQuestion + L" из " + CountQuestion;
     // количество вариантов ответа
     SQLiteDataReader^ readerCount = responseBD("SELECT COUNT(id_q) FROM answers WHERE id_q=" + numberQuestion + " AND id_t=" + CurrentRowIndex + ";");
     CountAnswers = 0;
@@ -366,10 +319,13 @@ System::Void QuestCLRProject::MasterForm::dataGridView1_CellClick(System::Object
     возможно проработать этот момент пока без логировани€ и учета ответа
     видимо многое вывести в функции
     */
+    
     // front
+    _tableLayoutPanel2->SuspendLayout();
     _tableLayoutPanel2->Controls->RemoveAt(1); //удал€ю из табличного сло€2 датагридвью с тестами (сама таблица не удал€етс€)
     fillTLP3();
     _tableLayoutPanel2->Controls->Add(_tableLayoutPanel3, 0, 1);
+    _tableLayoutPanel2->SetColumnSpan(_tableLayoutPanel3, 2);
     // end front
     // основной запрос вопроса, ответов и какой/какие из них правильные
     SQLiteDataReader^ readerQuestions = responseBD("SELECT tests_questions.question, answers.answer, answers.validity FROM tests_questions, answers WHERE tests_questions.id_t=" + CurrentRowIndex + " AND tests_questions.id_q=" + numberQuestion + " AND tests_questions.id_t = answers.id_t AND tests_questions.id_q = answers.id_q;");
@@ -382,7 +338,7 @@ System::Void QuestCLRProject::MasterForm::dataGridView1_CellClick(System::Object
                 else if (_labelQuestion->Text != "" && colCtr == 0)
                     continue;
                 else if (colCtr == 1)
-                    _aCBAnswers[numAns]->Text = readerQuestions->GetValue(colCtr)->ToString();
+                    _vCBAnswers[numAns]->Text = readerQuestions->GetValue(colCtr)->ToString();
                 // validity добавить
             }
             ++numAns;
@@ -390,6 +346,7 @@ System::Void QuestCLRProject::MasterForm::dataGridView1_CellClick(System::Object
     }
     readerQuestions->Close();
 
+    _tableLayoutPanel2->ResumeLayout();
     return System::Void();
 }
 
