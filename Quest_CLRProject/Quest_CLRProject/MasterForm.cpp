@@ -65,8 +65,10 @@ System::Void QuestCLRProject::MasterForm::fillTLP3() {
         chbTMP->CheckedChanged += gcnew System::EventHandler(this, &MasterForm::checkedChanged);
         _vCBAnswers->push_back(chbTMP);
     }
-    int RowCountAnswers = CountAnswers / 2;
+    int RowCountAnswers = CountAnswers;
     if (RowCountAnswers < 2) RowCountAnswers = 1;
+    if (RowCountAnswers % 2 != 0) RowCountAnswers++;
+    RowCountAnswers /= 2;
     _tableLayoutPanel3->RowCount = RowCountAnswers + 3; // + номер вопроса, вопрос и строка под кнопки
     _tableLayoutPanel3->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 50)));
     _tableLayoutPanel3->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 60)));
@@ -226,7 +228,7 @@ System::Void QuestCLRProject::MasterForm::checkedChanged(System::Object^ sender,
 
 // кнопка далее (следующий вопрос)
 System::Void QuestCLRProject::MasterForm::button_Next_Click(System::Object^ sender, System::EventArgs^ e) {
-    if (numberQuestion < CountQuestion) {
+    if (numberQuestion <= CountQuestion) {
         _tableLayoutPanel2->SuspendLayout();
         clearTLP3();
         _tableLayoutPanel2->Controls->Remove(_tableLayoutPanel3);
@@ -262,6 +264,8 @@ System::Void QuestCLRProject::MasterForm::button_Next_Click(System::Object^ send
                     else if (colCtr == 1)
                         _vCBAnswers[numAns]->Text = readerQuestions->GetValue(colCtr)->ToString();
                     // validity добавить
+                    // еще нет реализации учета правильных ответов
+                    // может вностить это в лог?
                 }
                 ++numAns;
             }
@@ -270,6 +274,11 @@ System::Void QuestCLRProject::MasterForm::button_Next_Click(System::Object^ send
         _toolStripStatusLabel1->Text = numberQuestion + L" из " + CountQuestion;
         _tableLayoutPanel2->ResumeLayout();
         numberQuestion++;
+    }
+    else {
+        // результат теста
+
+
     }
     
 
