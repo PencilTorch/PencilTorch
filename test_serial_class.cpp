@@ -10,6 +10,7 @@ using namespace std;
 
 sqlite3* db = 0; // хэндл объекта соединение к БД
 char* err = 0;
+
 static int callback(void* NotUsed, int argc, char** argv, char** azColName) {
     int i;
     for (i = 0; i < argc; i++) {
@@ -60,14 +61,17 @@ public:
     // Методы записи / чтения текущих данных(сериализации)
     void SaveToFile() {
         std::ostringstream oss;
-        oss.str(login_name);
-        int len = login_name.length();
-        oss.write((char*)&len, sizeof(int));
+        //oss.str(login_name);
+        //int len = login_name.length();
+        //oss.write((char*)&len, sizeof(int));
         for (int i = 0; i < login_name.length(); i++)
             oss.write((char*)&login_name[i], sizeof(login_name[i]));
-        oss.write((char*)&autirize_id, sizeof(int));
-        string SQL = "INSERT INTO logfile(name, quest, passage) VALUES(\'Jack\', 25, \'" + oss.str() + "\');";
-        int rc = sqlite3_exec(db, SQL.c_str(), callback, 0, &err);
+        //oss.write((char*)&autirize_id, sizeof(int));
+        string tmp = oss.str();
+        cout << tmp << endl;
+        string SQL = "INSERT INTO logfile(name, quest, passage) VALUES(\'Jack\', 25, \'" + tmp + "\');";
+        cout << SQL << endl;
+        int rc = sqlite3_exec(db, SQL.c_str(), 0, 0, &err);
         if (rc != SQLITE_OK) {
             fprintf(stderr, "SQL error: %s\n", err);
             sqlite3_free(err);
@@ -144,9 +148,9 @@ int main() {
     else {
         fprintf(stdout, "Create table successfully\n");
     }
-    
+
     // //insert_request("Shir", 100, "preshes");
-    
+    /*
     rc = sqlite3_exec(db, SQL2, callback, 0, &err);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", err);
@@ -155,8 +159,8 @@ int main() {
     else {
         fprintf(stdout, "INSERT in table successfully\n");
     }
-
-    rc = sqlite3_exec(db, SQL3, callback2, 0, &err);
+    */
+    rc = sqlite3_exec(db, SQL3, callback, 0, &err);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", err);
         sqlite3_free(err);
@@ -164,14 +168,13 @@ int main() {
     else {
         fprintf(stdout, "SELECT from table successfully\n");
     }
-    // закрываем соединение
-    sqlite3_close(db);
+    
 
-    std::cout << str;
+    //std::cout << str;
 
 
     // 1. Создать объект типа BOOK
-    LogFile obj1(20, "Doktor Dre");
+    LogFile obj1(500, "Titikaka");
 
     // 2. Сохранить объект obj1
     //obj1.Print();
@@ -188,6 +191,9 @@ int main() {
 
     // 6. Вывести прочитанный объект
     //obj2.Print();
+    // 
+    // закрываем соединение
+    sqlite3_close(db);
 
     return 0;
 }
