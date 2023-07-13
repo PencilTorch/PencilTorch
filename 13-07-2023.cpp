@@ -1,6 +1,4 @@
 ﻿// https://metanit.com/c/database/1.5.php
-// https://russianblogs.com/article/1931575077/
-// 
 #include <iostream>
 #include <stdio.h>
 #include <vector>
@@ -63,23 +61,37 @@ public:
     }
     // параметрическая запись
     void SaveToFile(string nm, int qn) {
+        string id = std::to_string(autirize_id);
+        int len = login_name.length() + id.length() + 1;
+        char* tmp = new char[len];
+        int i;
+        for (i = 0; i < login_name.length(); ++i)
+            tmp[i] = login_name[i];
+        tmp[i] = '\n';
+        i++;
+        for (int j = 0; i < len; ++i, ++j)
+            tmp[i] = id[j];
+        tmp[i] = '\0';
+        /*
         std::ostringstream oss;
         //oss.str(login_name);
-        int len = login_name.length();
+        int len2 = login_name.length();
         oss.write((char*)&len, sizeof(int));
-        for (int i = 0; i < login_name.length(); i++)
+        for (int i = 0; i < len; i++)
             oss.write((char*)&login_name[i], sizeof(login_name[i]));
         oss.write((char*)&autirize_id, sizeof(int));
         string tmp = oss.str();
+        oss.clear();
+        */
 
         string SQL = "INSERT INTO logfile(name, quest, passage) VALUES(?, ?, ?);";
 
         sqlite3_stmt* stmtInsert = nullptr;
-        int rc = sqlite3_prepare_v2(db, SQL.c_str(), -1, &stmtInsert, 0);
+        int rc = sqlite3_prepare_v2(db, SQL.c_str(), SQL.size(), &stmtInsert, 0);
         // привязываем параметры
         sqlite3_bind_text(stmtInsert, 1, nm.c_str(), -1, SQLITE_STATIC);
         sqlite3_bind_int(stmtInsert, 2, qn);
-        sqlite3_bind_blob(stmtInsert, 3, tmp.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_blob(stmtInsert, 3, tmp, sizeof(tmp), SQLITE_STATIC);
         // выполняем выражение
         int step = sqlite3_step(stmtInsert);
         if (step != SQLITE_DONE) {
@@ -90,6 +102,60 @@ public:
             fprintf(stdout, "INSERT in table successfully\n");
         }
         sqlite3_finalize(stmtInsert);
+    }
+    void ReadFromBD(int id) {
+        string SQL = "";
+        if (id)
+            SQL = "SELECT name, quest, passage FROM logfile  WHERE id = " + std::to_string(id) + ";";
+        else
+            SQL = "SELECT name, quest, passage FROM logfile;";
+        cout << SQL << endl;
+        sqlite3_stmt* res;  // указатель на скомпилированное выражение
+        int rc = sqlite3_prepare_v2(db, SQL.c_str(), SQL.size(), &res, 0);
+        if (rc != SQLITE_OK) {
+            fprintf(stderr, "SQL error: %s\n", err);
+            sqlite3_free(err);
+        }
+        else {
+            fprintf(stdout, "SELECT table successfully\n");
+            string t_name;
+            int t_id;
+            while (sqlite3_step(res) == SQLITE_ROW) {
+                printf("name: %s\t", sqlite3_column_text(res, 0));
+                printf("quest num: %d\t", sqlite3_column_int(res, 1));
+                //printf("Age: %d\n", sqlite3_column_blob(res, 2));
+                int bytes = sqlite3_column_bytes(res, 2);
+                char* tmp = new char[bytes];
+                tmp = (char*)sqlite3_column_blob(res, 2);
+                string t_str;
+                int i = 0;
+                while (tmp[i] != '\n') {
+                    t_str[i] = tmp[i];
+                    i++;
+                }
+
+                cout << sizeof(tmp) << endl;
+                char t_char[sizeof(int)];
+                int tmp_size;
+                int i;
+                for (i = 0; i < sizeof(int); ++i) {
+                    t_char[i] += tmp[i];
+                }
+                tmp_size = atoi(t_char);
+                for (; i < tmp_size; ++i) {
+                    t_name += tmp[i];
+                }
+                for (int j = 0; i < sizeof(tmp); ++i) {
+                    t_char[j] += tmp[i];
+                }
+                t_id = atoi(t_char);
+                cout << "login_name: " << t_name << "; autirize_id: " << t_id << endl;
+                
+
+            }
+        }
+        // удаляем скомпилированное выражение
+        sqlite3_finalize(res);
     }
 
     // Прикрутить чтение
@@ -160,7 +226,7 @@ int main() {
     else {
         fprintf(stdout, "Create table successfully\n");
     }
-    
+
     // //insert_request("Shir", 100, "preshes");
     /*
     rc = sqlite3_exec(db, SQL2, callback, 0, &err);
@@ -189,7 +255,9 @@ int main() {
     //obj1.Print();
 
     // 3. Записать в файл obj1 => "obj1.bin"
-    obj1.SaveToFile("Jo Dasen", 555);
+    //obj1.SaveToFile("Jo Dasen", 555);
+
+    obj1.ReadFromBD(7);
 
     // 4. Создать другой объект типа BOOK
     //LogFile obj2;
