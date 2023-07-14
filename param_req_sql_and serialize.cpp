@@ -1,15 +1,17 @@
-﻿#include <iostream>
+﻿// https://metanit.com/c/database/1.5.php
+// https://russianblogs.com/article/1931575077/
+#include <iostream>
 #include <stdio.h>
 #include <vector>
 #include <string>
 #include <fstream>
 #include <sstream>
-#include "sqlite3.h"
-//#include <sqlite3.h>
+#include <sqlite3.h>
 using namespace std;
 
 sqlite3* db = 0; // хэндл объекта соединение к БД
 char* err = 0;
+
 
 static int callback(void* NotUsed, int argc, char** argv, char** azColName) {
     int i;
@@ -57,31 +59,105 @@ public:
         cout << "autirize_id = " << autirize_id << endl;
         cout << "login_name = " << login_name << endl;
     }
-    // возможно кривая сериализация, проверить без sql
-    // Методы записи / чтения текущих данных(сериализации)
-    void SaveToFile() {
+    // параметрическая запись
+    void SaveToFile(string nm, int qn) {
+    	//сериализую из-за наличия string
+        string id = std::to_string(autirize_id);
+        int len = login_name.length() + id.length() + 1;
+        char* tmp = new char[len];
+        int i;
+        for (i = 0; i < login_name.length(); ++i)
+            tmp[i] = login_name[i];
+        tmp[i] = '\n';
+        i++;
+        for (int j = 0; i < len; ++i, ++j)
+            tmp[i] = id[j];
+        tmp[i] = '\0';
+        /*
         std::ostringstream oss;
         //oss.str(login_name);
-        //int len = login_name.length();
-        //oss.write((char*)&len, sizeof(int));
-        for (int i = 0; i < login_name.length(); i++)
+        int len2 = login_name.length();
+        oss.write((char*)&len, sizeof(int));
+        for (int i = 0; i < len; i++)
             oss.write((char*)&login_name[i], sizeof(login_name[i]));
-        //oss.write((char*)&autirize_id, sizeof(int));
+        oss.write((char*)&autirize_id, sizeof(int));
         string tmp = oss.str();
-        cout << tmp << endl;
-        string SQL = "INSERT INTO logfile(name, quest, passage) VALUES(\'Jack\', 25, \'" + tmp + "\');";
-        cout << SQL << endl;
-        int rc = sqlite3_exec(db, SQL.c_str(), 0, 0, &err);
-        if (rc != SQLITE_OK) {
+        oss.clear();
+        */
+        // при создании динамического чарового массива он всегда будет размером 4 байта
+        cout << "sizeof(tmp) " << sizeof(tmp) << endl;
+        // strlen возвращает размер до символа '\0'
+        cout << "strlen(tmp) " << strlen(tmp) << endl;
+        string SQL = "INSERT INTO logfile(name, quest, passage) VALUES(?, ?, ?);";
+
+        sqlite3_stmt* stmtInsert = nullptr;
+        int rc = sqlite3_prepare_v2(db, SQL.c_str(), SQL.size(), &stmtInsert, 0);
+        // привязываем параметры
+        sqlite3_bind_text(stmtInsert, 1, nm.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_int(stmtInsert, 2, qn);
+        sqlite3_bind_blob(stmtInsert, 3, tmp, strlen(tmp), SQLITE_STATIC);
+        // выполняем выражение
+        int step = sqlite3_step(stmtInsert);
+        if (step != SQLITE_DONE) {
             fprintf(stderr, "SQL error: %s\n", err);
             sqlite3_free(err);
         }
         else {
             fprintf(stdout, "INSERT in table successfully\n");
         }
+        sqlite3_finalize(stmtInsert);
+        delete[] tmp;
+    }
+    void ReadFromBD(int id) {
+        string SQL = "";
+        if (id)
+            SQL = "SELECT name, quest, passage FROM logfile  WHERE id = " + std::to_string(id) + ";";
+        else
+            SQL = "SELECT name, quest, passage FROM logfile;";
+        cout << SQL << endl;
+        sqlite3_stmt* res;  // указатель на скомпилированное выражение
+        int rc = sqlite3_prepare_v2(db, SQL.c_str(), SQL.size(), &res, 0);
+        if (rc != SQLITE_OK) {
+            fprintf(stderr, "SQL error: %s\n", err);
+            sqlite3_free(err);
+        }
+        else {
+            fprintf(stdout, "SELECT table successfully\n");
+            string t_name;
+            int t_id;
+            while (sqlite3_step(res) == SQLITE_ROW) {
+                printf("name: %s\t", sqlite3_column_text(res, 0));
+                printf("quest num: %d\t", sqlite3_column_int(res, 1));
+                //printf("Age: %d\n", sqlite3_column_blob(res, 2)); // если не сериализовать
+                int bytes = sqlite3_column_bytes(res, 2);
+                char* tmp = new char[bytes];
+                // возвращает указатель на blob. можно memcpy делать на экземпляр класса: memcpy(&tempStudent, pReadBolbData, len);
+                // https://russianblogs.com/article/1931575077/
+                tmp = (char*)sqlite3_column_blob(res, 2);
+                // далее парсим этот строковый массив
+                int i = 0;
+                while (tmp[i] != '\n') {
+                    t_name.push_back(tmp[i]);
+                    i++;
+                }
+               // t_name.push_back('\0'); не обязательно
+                string t_str;
+                i++;
+                while (tmp[i] != '\0') {
+                    t_str.push_back(tmp[i]);
+                    i++;
+                }
+                t_id = atoi(t_str.c_str());
+                // вывод содержимого blob-поля столбца passage
+                cout << "\nlogin_name: " << t_name << "; autirize_id: " << t_id << endl;
+            }
+        }
+        // удаляем скомпилированное выражение
+        sqlite3_finalize(res);
+        delete[] tmp;
     }
 
-    // Чтение массива из файла и запись в текущий экземпляр
+    // чтение из бинарного файла
     bool ReadFromFile(const char* filename) {
         // 1. Создать экземпляр класса ifstream
         ifstream inF(filename, ios::in | ios::binary);
@@ -114,6 +190,7 @@ private:
 };
 
 
+// вставка в виде функции
 bool insert_request(const string& name, const int quest, const string& passage) {
     string statistic_query = string("INSERT INTO logfile(name, quest, passage) VALUES (\'" + name + "\', " + std::to_string(quest) + ", \'" + passage + "\');");
     int request_status = sqlite3_exec(db, statistic_query.c_str(), callback, 0, &err);
@@ -168,19 +245,18 @@ int main() {
     else {
         fprintf(stdout, "SELECT from table successfully\n");
     }
-    
-
-    //std::cout << str;
 
 
     // 1. Создать объект типа BOOK
-    LogFile obj1(500, "Titikaka");
+    LogFile obj1(20, "Doktor Dre");
 
     // 2. Сохранить объект obj1
     //obj1.Print();
 
     // 3. Записать в файл obj1 => "obj1.bin"
-    obj1.SaveToFile();
+    //obj1.SaveToFile("Jo Dasen", 555);
+
+    obj1.ReadFromBD(9);
 
     // 4. Создать другой объект типа BOOK
     //LogFile obj2;
@@ -191,7 +267,7 @@ int main() {
 
     // 6. Вывести прочитанный объект
     //obj2.Print();
-    // 
+
     // закрываем соединение
     sqlite3_close(db);
 
