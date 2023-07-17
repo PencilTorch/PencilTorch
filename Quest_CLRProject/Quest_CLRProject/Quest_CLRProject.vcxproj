@@ -129,9 +129,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="LogFile.cpp" />
     <ClCompile Include="MasterForm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="LogFile.h" />
     <ClInclude Include="MasterForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
