@@ -1,5 +1,5 @@
 ﻿// сортировка Шелла
-// https://kwork.ru/projects/2207968/view
+
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
@@ -14,9 +14,9 @@ int GetRandomNumber(int min = 0, int max = 100) {
     return num;
 }
 
-// заполнение массива
-void fillArr(int** arr, const int size) {
-    srand(time(NULL));
+// заполнение массива в заданном диапазоне
+void fillArr(int** arr, int size) {
+    srand(static_cast<unsigned int>(time(NULL)));
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
             arr[i][j] = GetRandomNumber(MIN, MAX);
@@ -25,7 +25,7 @@ void fillArr(int** arr, const int size) {
 }
 
 // печать массива
-void printArr(const int* arr[], const int size) {
+void printArr(int** arr, int size) {
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
             std::cout << arr[i][j] << "\t";
@@ -35,7 +35,7 @@ void printArr(const int* arr[], const int size) {
     std::cout << std::endl;
 }
 
-// сортировка
+// сортировка одномерного массива
 void shellSort(int arr[], int size) {
     int step = size / 2;
     while (step > 0) {
@@ -52,11 +52,34 @@ void shellSort(int arr[], int size) {
 
 
 int main() {
-    int arr[SIZE][SIZE];
+    int** arr = new int* [SIZE];
+    for (int i = 0; i < SIZE; i++) {
+        arr[i] = new int[SIZE];
+    }
+
     fillArr(arr, SIZE);
     printArr(arr, SIZE);
-    shellSort(arr, SIZE);
+
+    // создаем вспомогательный массив для сортировки последнего столбца
+    int* aTemp = new int[SIZE];
+    for (int i = 0; i < SIZE; ++i) {
+        aTemp[i] = arr[i][SIZE - 1];
+    }
+    shellSort(aTemp, SIZE);
+    std::cout << "Shell sort last column:\n";
+    for (int i = 0; i < SIZE; ++i) {
+        std::cout <<"\t \t \t" << aTemp[i] << std::endl;
+    }
+
+    // можно переписать в основной массив отсортированные значения
+    for (int i = 0; i < SIZE; ++i) {
+        arr[i][SIZE - 1] = aTemp[i];
+    }
+    std::cout << "\nShell sort last column in first array:\n";
     printArr(arr, SIZE);
+
+    delete[] aTemp;
+    delete[] arr;
 
     return 0;
 }
