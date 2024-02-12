@@ -1,0 +1,28 @@
+Если проблемы с утечками памяти, то проделайте следующее:
+
+Подключите макрос и библиотеки 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+ 
+В теле main() перед точкой входа поместите две функции:
+    _CrtDumpMemoryLeaks(); 
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+(Прям так копируйте и вставляйте)
+ 
+В случае утечек памяти, в окне "отладка" (в VS) вам высветится объявление:
+Detected memory leaks!
+Dumping objects ->
+{169} normal block at 0x00A94648, 6 bytes long.
+ Data: <hello > 68 65 6C 6C 6F 00 
+Object dump complete.
+ 
+Если же утечек нет, то данного сообщения не будет.
+
+TEMP
+#define _GLIBCXX_USE_NANOSLEEP
+#include <wchar.h>
+#include <errno.h>
+
+вместо conio.h для линуха:
+#include <curses.h>  sudo apt-get install libncurses5-dev libncursesw5-dev
