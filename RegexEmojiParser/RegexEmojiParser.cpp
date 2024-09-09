@@ -13,10 +13,46 @@
 
 int main() {
     setlocale(LC_ALL, "ru_RU.UTF-8");
-    //Ѐ \U+400 \U000400
-    wchar_t wch{ U'\U00000400' };
+    std::wstring rpEmoticons = L"[\U0001F600-\U0001F64F]+|"; //emoticons
+    std::wstring rpSimPict = L"[\U0001F300-\U0001F5FF]+|"; //symbols & pictographs
+    std::wstring rpTransMaps = L"[\U0001F680-\U0001F6FF]+|"; //transport & map symbols
+    std::wstring rpFlags = L"[\U0001F1E0-\U0001F1FF]+|"; //flags (iOS)
+    std::wstring rpChines = L"[\U00002500-\U00002BEF]+|"; //chinese char
+    std::wstring rpArrows = L"[\u2194-\u2199\u21A9\u21AA\u23EA\u23EB\u23EC\u23ED\u23EE\u23EF]+|"; //arrows
+    std::wstring rpOver1 = L"[\U00002702-\U000027B0]+|";
+    std::wstring rpOver2 = L"[\U000024C2-\U0001F251]+|";
+    std::wstring rpOver3 = L"[\U0001f926-\U0001f937]+|";
+    std::wstring rpOver4 = L"[\U00010000-\U0010ffff]+|";
+    std::wstring rpOver5 = L"[\u2640-\u2642]+|";
+    std::wstring rpOver6 = L"[\u2600-\u2B55]+|";
+    std::wstring rpOver7 = L"[\u200d\u23cf\u23e9\u231a\ufe0f\u3030\u23F0\u23F3\u231B\u2328\u203C\u2049\u00A9\u00AE\u2122]+";
+    std::wstring rpSum = L"(" + rpEmoticons + rpSimPict + rpTransMaps + rpFlags + rpChines + rpArrows +
+            rpOver1 + rpOver2 + rpOver3 + rpOver4 + rpOver5 + rpOver6 + rpOver7 + L")";
+    std::wregex regPattern (rpSum);
+    std::wstring wstr;
+    while(1) {
+        std::wcout << L"введи символ:" << std::endl;
+        std::wcin >> wstr;
+        std::wstring result = std::regex_replace(wstr, regPattern, L"");
+        std::wcout << result << std::endl;
 
-    std::wcout << wch << std::endl;
+        /* emoji detected!
+        std::wregex reg (L"(.*)([\U0001F600-\U0001F64F]+)(.*)");
+        if(std::regex_match(wstr, reg)) {
+            std::wcout << L"да, детка!" << std::endl;
+        }
+        else {
+            std::wcout << L"что-то не так..." << std::endl;
+        }
+        */
+        wstr.clear();
+    }
+
+
+
+    //Ѐ \U+400 \U000400
+    //wchar_t wch{ U'\U00000400' };
+    //std::wcout << wch << std::endl;
 
     return 0;
 }
