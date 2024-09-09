@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
-set(SOURCES main.cpp)
+set(SOURCES RegexEmojiParser.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES} )
 
