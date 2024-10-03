@@ -5,26 +5,10 @@
 #include <vector>
 #include <algorithm>
 
-#define SOURSE "stop_words.txt"
-#define OUTPUT "output.txt"
+const char* SOURSE = "sourse.txt";
+const char* OUTPUT = "output.txt";
 
-void fillVSW(std::vector<std::string>& v, std::string sourse);
-void convertVerticalList(std::string sourse, std::string output);
-void clearRepid(std::vector<std::string>& v);
-void fromVectorToFile(std::vector<std::string>& v, std::string output);
-
-int main() {
-    std::vector<std::string> vsw;
-    //convertVerticalList(SOURSE, OUTPUT);
-    fillVSW(vsw, OUTPUT);
-    clearRepid(vsw);
-    std::sort(vsw.begin(), vsw.end());
-    fromVectorToFile(vsw, OUTPUT);
-
-  return 0;
-}
-
-void fillVSW(std::vector<std::string>& v, std::string sourse) {
+void fillVSW(std::vector<std::string>& v, const char* sourse) {
     std::ifstream fin(sourse);
     if (fin.is_open()) {
         std::string stmp;
@@ -32,11 +16,11 @@ void fillVSW(std::vector<std::string>& v, std::string sourse) {
             v.push_back(stmp);
     }
 }
-
-void convertVerticalList(std::string sourse, std::string output) {
+void convertVerticalList(const char* sourse, const char* output) {
     std::vector<std::string> vstr;
     std::ifstream fin(sourse);
     if (fin.is_open()) {
+        std::cout << "open sourse in convertVerticalList(...)" << std::endl;
         std::string str;
         while(std::getline(fin, str)){
             size_t it1 = 0;
@@ -52,24 +36,47 @@ void convertVerticalList(std::string sourse, std::string output) {
     fin.close();
     std::ofstream fout(output, std::ios::app);
     if (fout.is_open()) {
+        std::cout << "open output in convertVerticalList(...)" << std::endl;
         for(auto &it : vstr){
             fout << it + '\n';
         }
     }
     fout.close();
 }
-
 void clearRepid(std::vector<std::string>& v) {
-    for(size_t it = 0; it < v.size(); ++it){
-        for(size_t pos = it; pos < v.size(); ++pos){
-            if (v[it] == v[pos]) {
-                v.erase(v.begin() + pos);
+    for(auto it1 = v.begin(); it1 != v.end() - 1; ++it1){
+        auto it2 = it1 + 1;
+        while(it2 != v.end()){
+            if(it1.base() == it2.base()) {
+                it2 = v.erase(it2);
+                std::cout << "repid delete in clearRepid(...)" << std::endl;
             }
+            else
+                ++it2;
         }
-
     }
 }
-
-void fromVectorToFile(std::vector<std::string>& v, std::string output) {
-
+void fromVectorToFile(std::vector<std::string>& v, const char* output) {
+    std::ofstream fout(output, std::ios::app);
+    if (fout.is_open()) {
+        std::cout << "open output in fromVectorToFile(...)" << std::endl;
+        for(auto &it : v){
+            fout << it + '\n';
+        }
+    }
+    fout.close();
 }
+
+int main() {
+    std::vector<std::string> vsw;
+    convertVerticalList(SOURSE, OUTPUT);
+    fillVSW(vsw, OUTPUT);
+    clearRepid(vsw);
+    std::sort(vsw.begin(), vsw.end());
+    fromVectorToFile(vsw, "output2.txt");
+
+  return 0;
+}
+
+
+
