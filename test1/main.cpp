@@ -44,15 +44,10 @@ void convertVerticalList(const char* sourse, const char* output) {
     fout.close();
 }
 void clearRepid(std::vector<std::string>& v) {
-    for(auto it1 = v.begin(); it1 != v.end() - 1; ++it1){
-        auto it2 = it1 + 1;
-        while(it2 != v.end()){
-            if(it1.base() == it2.base()) {
-                it2 = v.erase(it2);
-                std::cout << "repid delete in clearRepid(...)" << std::endl;
-            }
-            else
-                ++it2;
+    for(std::vector<std::basic_string<char>>::iterator it1 = v.begin(); it1 != v.end() - 1; ++it1){
+        for(std::vector<std::basic_string<char>>::iterator it2 = it1 + 1; it2 != v.end(); ++it2){
+            if(*it1 == *it2)
+                it2 = v.erase(it2) - 1;
         }
     }
 }
@@ -69,8 +64,8 @@ void fromVectorToFile(std::vector<std::string>& v, const char* output) {
 
 int main() {
     std::vector<std::string> vsw;
-    convertVerticalList(SOURSE, OUTPUT);
-    fillVSW(vsw, OUTPUT);
+    //convertVerticalList(SOURSE, OUTPUT);
+    fillVSW(vsw, SOURSE);
     clearRepid(vsw);
     std::sort(vsw.begin(), vsw.end());
     fromVectorToFile(vsw, "output2.txt");
