@@ -64,11 +64,11 @@ void fromVectorToFile(std::vector<std::string>& v, const char* output) {
 
 int main() {
     std::vector<std::string> vsw;
-    //convertVerticalList(SOURSE, OUTPUT);
-    fillVSW(vsw, SOURSE);
+    convertVerticalList(SOURSE, OUTPUT);
+    fillVSW(vsw, OUTPUT);
     clearRepid(vsw);
     std::sort(vsw.begin(), vsw.end());
-    fromVectorToFile(vsw, "output2.txt");
+    fromVectorToFile(vsw, "stop_words.txt");
 
   return 0;
 }
