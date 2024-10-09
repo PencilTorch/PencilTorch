@@ -4,9 +4,11 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <sqlite3.h>
 
 const char* SOURSE = "sourse.txt";
 const char* OUTPUT = "output.txt";
+const char* MyBAZA = "AntiSpam.sqlite3";
 
 void fillVSW(std::vector<std::string>& v, const char* sourse) {
     std::ifstream fin(sourse);
@@ -61,14 +63,43 @@ void fromVectorToFile(std::vector<std::string>& v, const char* output) {
     }
     fout.close();
 }
+void fillSQLSW(const char* sql_base, const std::vector<std::string>& vsw) {
+    sqlite3* _db = nullptr;
+    char* _err = nullptr;
+    int rc = sqlite3_open(sql_base, &_db);
+    if (rc != SQLITE_OK) {
+        std::cout << "Can't open database: " << _err << std::endl << sqlite3_errmsg(_db);
+        sqlite3_close(_db);
+    }
+    else
+        std::cout << "Opened database successfully! " << std::endl;
+    /*=================================================================*/
+    sqlite3_stmt* _res = nullptr;
+    std::string SQL = "INSERT INTO StopWords(word) VALUES (?);";
+    for(auto& it : vsw) {
+        rc = sqlite3_prepare_v2(_db, SQL.c_str(), (int)SQL.size(), &_res, 0);
+        if (rc != SQLITE_OK) {
+            fprintf(stderr, "Error request to stopwords, SQL error: %s\n", _err);
+            sqlite3_free(_err);
+        }
+        else {
+            sqlite3_bind_text(_res, 1, it.c_str(), -1, SQLITE_STATIC);
+            if (SQLITE_DONE != sqlite3_step(_res))
+                fprintf(stderr, "Error insert into stopwords, SQL error: %s\n", _err);
+        }
+    }
+    sqlite3_finalize(_res);
+    sqlite3_close(_db);
+}
 
 int main() {
     std::vector<std::string> vsw;
-    convertVerticalList(SOURSE, OUTPUT);
-    fillVSW(vsw, OUTPUT);
+    //convertVerticalList(SOURSE, OUTPUT);
+    fillVSW(vsw, "stop_words.txt");
     clearRepid(vsw);
     std::sort(vsw.begin(), vsw.end());
-    fromVectorToFile(vsw, "stop_words.txt");
+    //fromVectorToFile(vsw, "stop_words.txt");
+    fillSQLSW(MyBAZA, vsw);
 
   return 0;
 }
